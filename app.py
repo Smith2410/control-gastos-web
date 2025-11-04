@@ -1,3 +1,5 @@
+import json
+import os
 from flask import Flask, render_template, request, jsonify, send_file
 import pandas as pd
 from google.oauth2 import service_account
@@ -18,14 +20,24 @@ SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
-CREDS_PATH = "creds/service_account.json"
 
-credentials = service_account.Credentials.from_service_account_file(
-    CREDS_PATH, scopes=SCOPES
-)
+# CREDS_PATH = "creds/service_account.json"
+# credentials = service_account.Credentials.from_service_account_file(
+#     CREDS_PATH, scopes=SCOPES
+# )
+# gc = gspread.authorize(credentials)
+# sheet = gc.open(SHEET_NAME).sheet1
+
+SHEET_NAME = "Control de Gastos Telegram"
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
+
+creds_dict = json.loads(os.getenv("GOOGLE_CREDS"))
+credentials = service_account.Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 gc = gspread.authorize(credentials)
 sheet = gc.open(SHEET_NAME).sheet1
-
 
 # --- Función para obtener datos desde Google Sheets ---
 def obtener_datos_google_sheets():
@@ -168,3 +180,4 @@ def descargar_excel():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
